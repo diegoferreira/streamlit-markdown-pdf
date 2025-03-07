@@ -12,7 +12,7 @@ markdown_text = st.text_area("Insira seu texto em Markdown aqui:")
 # Função para converter Markdown em PDF
 def convert_markdown_to_pdf(md_text):
     try:
-        # Converter Markdown para HTML (e depois para texto simples, se necessário)
+        # Converter Markdown para HTML
         html = markdown2.markdown(md_text)
 
         # Criar um objeto PDF
@@ -25,9 +25,9 @@ def convert_markdown_to_pdf(md_text):
 
         # Salvar o PDF em um buffer
         pdf_buffer = BytesIO()
-        pdf_bytes = pdf.output(dest='S').encode('latin1')  # Converter para bytes
-        pdf_buffer.write(pdf_bytes)
-        pdf_buffer.seek(0)
+        pdf_bytes = pdf.output(dest='S')  # Retorna um bytearray
+        pdf_buffer.write(pdf_bytes)  # Escreve o bytearray no buffer
+        pdf_buffer.seek(0)  # Volta ao início do buffer
         return pdf_buffer
     except Exception as e:
         st.error(f"Erro ao converter Markdown para PDF: {e}")
