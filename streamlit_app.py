@@ -25,7 +25,8 @@ def convert_markdown_to_pdf(md_text):
 
     # Salvar o PDF em um buffer
     pdf_buffer = BytesIO()
-    pdf.output(pdf_buffer)
+    pdf.output(dest='S').encode('latin1')  # Salvar diretamente em uma string
+    pdf_buffer.write(pdf.output(dest='S').encode('latin1'))
     pdf_buffer.seek(0)
     return pdf_buffer
 
