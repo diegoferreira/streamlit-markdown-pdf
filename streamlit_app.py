@@ -11,34 +11,38 @@ markdown_text = st.text_area("Insira seu texto em Markdown aqui:")
 
 # Função para converter Markdown em PDF
 def convert_markdown_to_pdf(md_text):
-    # Converter Markdown para texto simples
-    text = markdown2.markdown(md_text)
+    try:
+        # Converter Markdown para HTML (e depois para texto simples, se necessário)
+        html = markdown2.markdown(md_text)
 
-    # Criar um objeto PDF
-    pdf = FPDF()
-    pdf.add_page()
-    pdf.set_font("Arial", size=12)
+        # Criar um objeto PDF
+        pdf = FPDF()
+        pdf.add_page()
+        pdf.set_font("Arial", size=12)
 
-    # Adicionar o conteúdo texto ao PDF
-    for line in text.split('\n'):
-        pdf.multi_cell(0, 10, line)
+        # Adicionar o conteúdo HTML ao PDF
+        pdf.write_html(html)  # Usar write_html para adicionar o conteúdo formatado
 
-    # Salvar o PDF em um buffer
-    pdf_buffer = BytesIO()
-    pdf_bytes = pdf.output(dest='S')  # Usar 'S' para obter o PDF como bytes
-    pdf_buffer.write(pdf_bytes)
-    pdf_buffer.seek(0)
-    return pdf_buffer
+        # Salvar o PDF em um buffer
+        pdf_buffer = BytesIO()
+        pdf_bytes = pdf.output(dest='S').encode('latin1')  # Converter para bytes
+        pdf_buffer.write(pdf_bytes)
+        pdf_buffer.seek(0)
+        return pdf_buffer
+    except Exception as e:
+        st.error(f"Erro ao converter Markdown para PDF: {e}")
+        return None
 
 # Botão para gerar o PDF
 if st.button("Gerar PDF"):
     if markdown_text:
         pdf_buffer = convert_markdown_to_pdf(markdown_text)
-        st.download_button(
-            label="Baixar PDF",
-            data=pdf_buffer,
-            file_name="output.pdf",
-            mime="application/pdf"
-        )
+        if pdf_buffer:
+            st.download_button(
+                label="Baixar PDF",
+                data=pdf_buffer,
+                file_name="output.pdf",
+                mime="application/pdf"
+            )
     else:
         st.warning("Por favor, insira algum texto em Markdown.")
